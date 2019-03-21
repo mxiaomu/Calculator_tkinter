@@ -2,6 +2,7 @@ import tkinter
 
 root = tkinter.Tk()
 
+# 异常处理类
 class FError(Exception):
     pass
 
