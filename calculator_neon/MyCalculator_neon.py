@@ -1,5 +1,5 @@
 import tkinter
-
+import math
 root = tkinter.Tk()
 
 class FError(Exception):
@@ -40,12 +40,12 @@ class MyCalculator():
         result_label1 = tkinter.Label(self.top_frame, font=('微软雅黑', 25), bg='#84C6C3', bd='9', fg='#FFFEFF', anchor='se',
                               textvariable=self.result_panel1)
         result_label1.place(width=450, height=100)
-        result_label2 = tkinter.Label(self.top_frame,font=('微软雅黑', 50), bg='#3F8CA0', bd='9', fg='#FFFEFF', anchor='se',
+        result_label2 = tkinter.Label(self.top_frame,font=('微软雅黑', 30), bg='#3F8CA0', bd='9', fg='#FFFEFF', anchor='se',
                                textvariable=self.result_panel2)
         result_label2.place(x=0,y=100, width=450, height=100)
 
     def set_span(self):
-        self.bootom_frame = tkinter.Frame(root, width=450, height=400)
+        self.bootom_frame = tkinter.Frame(root, width=450, height=480)
         self.bootom_frame.place(x=0, y=200)
 
         button_c = tkinter.Button(self.bootom_frame, text='C', bd='0', font=('微软雅黑', 20), bg='#443D69',
@@ -120,17 +120,17 @@ class MyCalculator():
                                   fg='#FFFEFF', command=lambda: self.pressNum('9'))
         button_9.place(x=180, y=240, width=90, height=80)
 
-        button_mul = tkinter.Button(self.bootom_frame, text='*', bd='0', font=('微软雅黑', 20), bg='#3B325A',
+        button_mul = tkinter.Button(self.bootom_frame, text='×', bd='0', font=('微软雅黑', 20), bg='#3B325A',
                                     fg='#FFFEFF', command=lambda: self.pressOperation('*'))
         button_mul.place(x=270, y=240, width=90, height=80)
 
-        button_div = tkinter.Button(self.bootom_frame, text='/', bd='0', font=('微软雅黑', 20), bg='#3B325A',
+        button_div = tkinter.Button(self.bootom_frame, text='÷', bd='0', font=('微软雅黑', 20), bg='#3B325A',
                                     fg='#FFFEFF', command=lambda: self.pressOperation('/'))
         button_div.place(x=360, y=240, width=90, height=80)
 
         button_0 = tkinter.Button(self.bootom_frame, text='0', bd='0', font=('微软雅黑', 20), bg='#443D69',
                                   fg='#FFFEFF', command=lambda: self.pressNum('0'))
-        button_0.place(x=0, y=320, width=180, height=80)
+        button_0.place(x=90, y=320, width=90, height=80)
 
         button_point = tkinter.Button(self.bootom_frame, text='.', bd='0', font=('微软雅黑', 20), bg='#443D69',
                                       fg='#FFFEFF', command=lambda: self.pressNum('.'))
@@ -140,8 +140,13 @@ class MyCalculator():
                                    fg='#FFFEFF', command=lambda: self.pressEqual())
         button_eq.place(x=270, y=320, width=180, height=80)
 
+        button_jump = tkinter.Button(self.bootom_frame, text='特殊', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                     fg='#FFFEFF', command=lambda: self.Cover())
+        button_jump.place(x=0, y=320, width=90, height=80)
+
     def pressC(self):
         self.calList.clear()
+        self.flag = False
         self.result_panel1.set('')
         self.result_panel2.set(0)
 
@@ -178,6 +183,30 @@ class MyCalculator():
         self.calList.append(')')
         self.result_panel2.set(''.join(self.calList))
 
+    def pressSin(self):
+        self.calList.append('sin()')
+        self.result_panel2.set(''.join(self.calList))
+
+    def pressCos(self):
+        self.calList.append('cos()')
+        self.result_panel2.set(''.join(self.calList))
+
+    def pressTan(self):
+        self.calList.append('tan()')
+        self.result_panel2.set(''.join(self.calList))
+
+    def pressFractal(self):
+        self.calList.clear()
+        result = self.result_panel2.get()
+        self.calList.append('1' + '/' + result)
+        self.result_panel2.set(''.join(self.calList))
+
+    def pressSqrt(self):
+        self.calList.clear()
+        result = self.result_panel2.get()
+        self.calList.append('sqrt({})'.format(result))
+        self.result_panel2.set(''.join(self.calList))
+
     def pressNum(self, num):
         oldNum = self.result_panel2.get()
         if oldNum == '0' and self.flag == False:
@@ -192,17 +221,32 @@ class MyCalculator():
                     self.calList.append(num)
                 else:
                     self.calList.append(num)
-                    self.result_panel2.set(''.join(self.calList))
+                    self.result_panel2.set(''.join(self.calList).
+                                           replace('*', '×').
+                                           replace('/', '÷'))
                 self.flag = False
             else:
-                newNum = oldNum + num
-                self.result_panel2.set(newNum)
-                self.calList.clear()
-                self.calList.append(newNum)
+                self.flag = False
+                if len(self.calList) != 0 and (
+                        'sin' in self.calList[-1] or 'cos' in self.calList[-1] or 'tan' in self.calList[-1]):
+                    if 'sin' in self.calList[-1]:
+                        self.calList[-1] = str('sin({})').format(num)
+                        self.result_panel2.set(''.join(self.calList))
+                    elif 'cos' in self.calList[-1]:
+                        self.calList[-1] = str('cos({})').format(num)
+                        self.result_panel2.set(''.join(self.calList))
+                    elif 'tan' in self.calList[-1]:
+                        self.calList[-1] = str('tan({})').format(num)
+                        self.result_panel2.set(''.join(self.calList))
+                else:
+                    newNum = oldNum + num
+                    self.result_panel2.set(newNum)
+                    self.calList.clear()
+                    self.calList.append(newNum)
 
     def pressOperation(self, operation):
         num = self.result_panel2.get()
-        if num[-1] in '+-/*^%':
+        if num[-1] in '+-÷×^%':
             self.format = False
         if len(num) > 0:
             if num[0] == '(' and len(num) != 1:
@@ -214,7 +258,7 @@ class MyCalculator():
 
         self.isPressOperation = True
         self.calList.append(operation)
-        self.result_panel2.set(''.join(self.calList))
+        self.result_panel2.set(''.join(self.calList).replace('/', '÷').replace('*', '×'))
 
     def pressEqual(self):
         if self.format == False:
@@ -228,7 +272,11 @@ class MyCalculator():
                 return
         try:
             if len(self.calList) != 0:
-                self.result = round(eval(''.join(self.calList).replace('^','**')), 11)
+                self.result = round(eval(''.join(self.calList).replace('^', '**').replace('÷', '/').
+                                         replace('×', '*').replace('sin', 'math.sin')
+                                         .replace('cos', 'math.cos')
+                                         .replace('tan', 'math.tan')
+                                         .replace('sqrt', 'math.sqrt')), 8)
                 self.result_panel2.set(self.result)
                 self.result_panel1.set(''.join(self.calList))
                 self.calList.clear()
@@ -249,7 +297,6 @@ class MyCalculator():
             self.calList.clear()
             self.result_panel1.set('')
 
-
     def Mouse_Press3(self, e):
         global color_list
         color_list = ['#6495ed', '#8b008b', '#00ced1']
@@ -258,7 +305,8 @@ class MyCalculator():
         e.widget['bg'] = color_list[self.color_index]
         self.color_index += 1
 
-    # 鼠标滚轮事件
+        # 鼠标滚轮事件
+
     def Mouse_on(self, e):
         if e.delta == -120 and self.nums > 0.11:
             self.nums -= 0.1
@@ -270,6 +318,38 @@ class MyCalculator():
     def call_fun(self):
         self.bootom_frame.bind_class('Button', '<ButtonPress-3>', self.Mouse_Press3)
         root.bind('<MouseWheel>', self.Mouse_on)
+
+    def Cover(self):
+        root.minsize(height=680, width=450)
+        button_jump = tkinter.Button(self.bootom_frame, text='普通', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                     fg='#FFFEFF', command=lambda: self.Commer())
+        button_jump.place(x=0, y=320, width=90, height=80)
+
+        button_sin = tkinter.Button(self.bootom_frame, text='sin(x)', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                    fg='#FFFEFF', command=lambda: self.pressSin())
+        button_sin.place(x=0, y=400, width=90, height=80)
+
+        button_cos = tkinter.Button(self.bootom_frame, text='cos(x)', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                    fg='#FFFEFF', command=lambda: self.pressCos())
+        button_cos.place(x=90, y=400, width=90, height=80)
+
+        button_tan = tkinter.Button(self.bootom_frame, text='tan(x)', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                    fg='#FFFEFF', command=lambda: self.pressTan())
+        button_tan.place(x=180, y=400, width=90, height=80)
+
+        button_ds = tkinter.Button(self.bootom_frame, text='1/x', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                   fg='#FFFEFF', command=lambda: self.pressFractal())
+        button_ds.place(x=270, y=400, width=90, height=80)
+
+        button_sl = tkinter.Button(self.bootom_frame, text='√x', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                   fg='#FFFEFF', command=lambda: self.pressSqrt())
+        button_sl.place(x=360, y=400, width=90, height=80)
+
+    def Commer(self):
+        root.minsize(height=600, width=450)
+        button_jump = tkinter.Button(self.bootom_frame, text='特殊', bd='0', font=('微软雅黑', 20), bg='#443D69',
+                                     fg='#FFFEFF', command=lambda: self.Cover())
+        button_jump.place(x=0, y=320, width=90, height=80)
 
 
 if __name__ == '__main__':
