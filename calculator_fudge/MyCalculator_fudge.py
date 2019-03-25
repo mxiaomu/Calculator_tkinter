@@ -1,6 +1,6 @@
 import math
 import tkinter
-
+import re
 root = tkinter.Tk()
 
 class FError(Exception):
@@ -231,13 +231,16 @@ class MyCalculator():
                 self.flag = False
                 if len(self.calList) != 0 and ('sin' in self.calList[-1] or 'cos' in self.calList[-1] or 'tan' in self.calList[-1]):
                     if 'sin' in self.calList[-1]:
-                        self.calList[-1] = str('sin({})').format(num)
+                        s = re.findall(r"sin\(([^\)]+)\)", ''.join(self.calList[-1]))
+                        self.calList[-1] = str('sin({})').format(''.join(s)+num)
                         self.result_panel2.set(''.join(self.calList))
                     elif 'cos' in self.calList[-1]:
-                        self.calList[-1] = str('cos({})').format(num)
+                        s = re.findall(r"cos\(([^\)]+)\)", ''.join(self.calList[-1]))
+                        self.calList[-1] = str('cos({})').format(''.join(s) + num)
                         self.result_panel2.set(''.join(self.calList))
                     elif 'tan' in self.calList[-1]:
-                        self.calList[-1] = str('tan({})').format(num)
+                        s = re.findall(r"tan\(([^\)]+)\)", ''.join(self.calList[-1]))
+                        self.calList[-1] = str('tan({})').format(''.join(s) + num)
                         self.result_panel2.set(''.join(self.calList))
                 else:
                     newNum = oldNum + num
